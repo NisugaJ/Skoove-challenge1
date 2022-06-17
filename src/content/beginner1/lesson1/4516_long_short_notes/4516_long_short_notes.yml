@@ -1,0 +1,107 @@
+template: Sequence
+config:
+  signature: "4:4"
+taskSequence:
+  - "segmentId": "segment1"
+    "offTime": true
+    "handVideo": true
+    "listen": true
+    "tempo": 144
+  - "segmentId": "segment2"
+    "offTime": true
+    "handVideo": false
+    "listen": true
+    "tempo": 144
+  - "segmentId": "segment3"
+    "offTime": true
+    "handVideo": false
+    "listen": true
+    "tempo": 144
+  - "segmentId": "segment4"
+    "offTime": true
+    "handVideo": false
+    "listen": false
+    "tempo": 144
+
+segments:
+  #dd task 2.1
+  segment1:
+    flyer:
+      src: l/D_D_1.svg
+      "startX": 120.5
+      "beatDeltaX": 29
+      "freezeFrom": 34
+      "freezeUntil": 102.82
+    startVoiceOver:
+      src: l/long_notes.aifc
+    listenAudioCue:
+      src: D_D_1.aifc
+    handvideo:
+      src: dd.mp4
+      "captions":
+        "60": "/l/note/c"
+        "62": "/l/note/d"
+        "64": "/l/note/e"
+        "65": "/l/note/f"
+      overlays: true
+    expectation:
+      src: D_D_1.csv
+    timing:
+      length: "1:3"
+      preListen: "0:1"
+      prePlay: "0:2"
+
+
+  #D_D_ task 2.2
+  segment2:
+    flyer:
+      src: /dynamic_marks.svg
+      "startX": 120.5
+      "beatDeltaX": 29
+      "freezeFrom": 34
+      "freezeUntil": 102.82
+    startVoiceOver:
+      src: l/short_notes.aifc
+    listenAudioCue:
+      src: dd_1.aifc
+    expectation:
+      src: dd_1.csv
+    timing:
+      length: "1:1:1"
+      preListen: "0:1"
+      prePlay: "0:3"
+
+    #ddFddf task 2.3
+  segment3:
+    flyer:
+      src: l/ddFddF_1.svg
+      "startX": 120.5
+      "beatDeltaX": 29
+      "freezeFrom": 34
+      "freezeUntil": 102.82
+    startVoiceOver:
+      src: l/short_long_notes_combined.aifc
+    listenAudioCue:
+      src: ddFddF_1.aifc
+    expectation:
+      src: ddFddF_1.csv
+    timing:
+      length: "1:3"
+      preListen: "0:1"
+      prePlay: "0:3"
+
+        #DDffDDff task 2.4
+  segment4:
+    flyer:
+      src: l/DDffDDff.svg
+      "startX": 120.5
+      "beatDeltaX": 29
+      "freezeFrom": 34
+      "freezeUntil": 102.82
+    startVoiceOver:
+      src: /l/rhythm/reminder_note_duration.aifc
+    expectation:
+      src: DDffDDff.csv
+    timing:
+      length: "4:0:0"
+      prePlay: "0:2"

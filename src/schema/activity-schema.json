@@ -1,0 +1,271 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Activity",
+    "description": "An activity in the Skoove 2 content",
+    "definitions": {
+        "audioCue": {
+            "type": "object",
+            "properties": {
+                "src": {
+                    "type": "string",
+                    "description": "URL of the source file"
+                },
+                "start": {
+                    "type": "number",
+                    "description": "offset in ms from the beginning of the file when playing should start"
+                },
+                "length": {
+                    "type": "number",
+                    "description": "ms from start after which playing should stop"
+                },
+                "countin": {
+                    "type": "object",
+                    "description": "specification for countin",
+                    "properties": {
+                        "ticksPerClick": {
+                            "type": "number",
+                            "description": "Number of ticks per click as specified in the sequence"
+                        },
+                        "sequence": {
+                            "type": "string",
+                            "description": "sequence of H (high click), L (low click) and - (no click) characters. The length will determine when the countin starts"
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "keycaptions": {
+            "type": "object"
+        },
+        "segment": {
+            "type": "object",
+            "properties": {
+                "flyer": {
+                    "type": "object",
+                    "properties": {
+                        "src": {
+                            "type": "string",
+                            "description": "URL of image source file"
+                        },
+                        "left": {
+                            "type": "number",
+                            "description": "leftmost x-coordinate in the image to be shown"
+                        },
+                        "width": {
+                            "type": "number",
+                            "description": "width of the portion of the image to be shown"
+                        },
+                        "startX": {
+                            "type": "number",
+                            "description": "x-coordinate of the first beat represented in the image"
+                        },
+                        "beatDeltaX": {
+                            "type": "number",
+                            "description": "x-distance between two beats"
+                        },
+                        "freezeFrom": {
+                            "type": "number",
+                            "description": "from which x coordinate in the image the frozen section should start"
+                        },
+                        "freezeUntil": {
+                            "type": "number",
+                            "description": "at which x coordinate in the image the frozen section should end"
+                        }
+
+                    },
+                    "required": ["src", "startX", "beatDeltaX"],
+                    "additionalProperties": false
+                },
+                "listenAudioCue": {
+                    "$ref": "#/definitions/audioCue"
+                },
+                "playAudioCue": {
+                    "$ref": "#/definitions/audioCue"
+                },
+                "startVoiceOver": {
+                    "type": "object",
+                    "properties": {
+                        "src": {
+                            "type": "string",
+                            "description": "URL of video source file"
+                        },
+                        "length": {
+                            "type": "number",
+                            "description": "seconds after start when the task can be started. Default is 3.0. Do not use a value less than 1.0, this will lead to an alignment bug (cf. AudioItemController)"
+                        },
+                        "additionalProperties": false
+                    }
+                },
+                "handvideo": {
+                    "type": "object",
+                    "properties": {
+                        "src": {
+                            "type": "string",
+                            "description": "URL of video source file"
+                        },
+                        "start": {
+                            "type": "number",
+                            "description": "offset in ms from the beginning of the file when playing should start"
+                        },
+                        "length": {
+                            "type": "number",
+                            "description": "ms from start after which playing should stop"
+                        },
+                        "overlays": {
+                            "type": "boolean",
+                            "description": "should key overlays be shown based on the expectation?"
+                        },
+                        "captions": {
+                            "$ref": "#/definitions/keycaptions"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "expectation": {
+                    "type": "object",
+                    "properties": {
+                        "src": {
+                            "type": "string",
+                            "description": "URL of CSV expectations file"
+                        },
+                        "successThreshold": {
+                            "type": "number",
+                            "description": "performance score required for succeeding. Default is 0.65"
+                        },
+                        "ignoreOctave": {
+                            "type": "boolean",
+                            "description": "if true, only pitch class will be evaluated, regardless of octave"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "backingTrack": {
+                    "type": "object",
+                    "properties": {
+                        "src": {
+                            "type": "string",
+                            "description": "URL of audio source file"
+                        },
+                        "start": {
+                            "type": "number",
+                            "description": "offset in ms from the beginning of the file when playing should start"
+                        },
+                        "length": {
+                            "type": "number",
+                            "description": "ms from start after which playing should stop"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "timing": {
+                    "type": "object",
+                    "properties": {
+                        "length": {
+                            "type": "string",
+                            "description": "the length of the played segment in the form BARS:BEATS:TICKS. Beats and Ticks are optional"
+                        },
+                        "preListen": {
+                            "type": "string",
+                            "description": "how much time after the start of the task should listening start, in the form BARS:BEATS:TICKS. Beats and Ticks are optional"
+                        },
+                        "prePlay": {
+                            "type": "string",
+                            "description": "how much time after the end of listening should playing start, in the form BARS:BEATS:TICKS. Beats and Ticks are optional"
+                        },
+                        "preOnlyPlay": {
+                            "type": "string",
+                            "description": "in Play-Only (no Listen), how much time after the start of the task should playing start, in the form BARS:BEATS:TICKS. The default is preListen + prePlay"
+                        }
+                    },
+                    "required": ["length"],
+                    "additionalProperties": false
+                },
+                "instruction": {
+                    "type": "string",
+                    "description": "phrase path for instruction to be shown on the screen"     
+                }
+            },
+            "required": ["flyer", "timing"],
+            "additionalProperties": false
+        }
+    },
+    "type": "object",
+
+    "properties": {
+        "template": {
+            "type": "string",
+            "description": "ID of the template based on which a scheduler is chosen"
+        },
+        "segments": {
+            "type": "object",
+            "additionalProperties": {
+                "$ref": "#definitions/segment"
+            }
+        },
+        "config": {
+            "description": "Free form config parameters",
+            "type": "object"
+        },
+        "taskSequence": {
+            "description": "a sequence of tasks, for schedulers that allow a variable number of tasks",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "segmentId": {
+                        "type": "string",
+                        "description": "id of the segment to be used for the task"
+                    },
+                    "offTime": {
+                        "type": "boolean",
+                        "description": "true for play off-time, false for play in-time. When using flexi-time, indicates the mode to start in."
+                    },
+                    "flexiTime": {
+                        "type": "boolean",
+                        "description": "true for flexiTime, where user performance controls offTime and tempo settings, until a target tempo is reached"
+                    },
+                    "handVideo": {
+                        "type": "boolean",
+                        "description": "should handvideo be shown"
+                    },
+                    "handVideoStayOnFirstFrame": {
+                        "type": "boolean",
+                        "description": "is it a still video that should stay on the first frame"
+                    },
+                    "listen": {
+                        "type": "boolean",
+                        "description": "is there a listen phase?"
+                    },
+                    "metronomeActive": {
+                        "type": "boolean",
+                        "description": "should the metronome be active by default? An undefined value will leave the metronome in the same state as the user left it in the previous task. False turns it off by default."
+                    },
+                    "initialTempo": {
+                        "type": "number",
+                        "description": "initial tempo for flexiTime"
+                    },
+                    "tempo": {
+                        "type": "number",
+                        "description": "tempo in bpm. Target tempo when using flexiTime"
+                    },
+                    "durationCheck": {
+                        "type": "object",
+                        "description": "tempo in bpm. Target tempo when using flexiTime"
+                    },
+                    "properties": {
+                        "includeExpectationsLongerThan": {
+                            "type": "number",
+                            "description": "for notes that have at least this number of ticks, it will be checked if there performed duration is at least half of the expected one"
+                        }
+                    }
+                },
+                "required": ["segmentId", "tempo"],
+                "additionalProperties": false
+            }
+        }
+    },
+    "additionalProperties": false
+    
+}
