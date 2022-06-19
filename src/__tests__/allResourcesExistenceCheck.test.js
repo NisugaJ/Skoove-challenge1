@@ -29,14 +29,27 @@ function getLessonDirectories() {
 
 function getFilePathToCheck(lessonDirectory, referenceKey, pathExpression) {
     let basePath = lessonDirectory
-    if (pathExpression.trim()[0] === '/')
+    let path = pathExpression
+    if ((new RegExp(/^(\/)/mg)).test(path)) {
         basePath = SHARED_FOLDER
+        path = path.replace(/^(\/)/mg, '')
+    }
 
-    if (pathExpression.trim().startsWith('l/') || pathExpression.trim().startsWith('/l/'))
-        return basePath + '/' + FILE_RESOURCES_INFO[referenceKey] + `/${CURRENT_LOCALE}/` + pathExpression.trim('/').split('l/')[1]
+    if ((new RegExp(/^(l\/)/mg)).test(path)) {
+        // removal of l/ at start of the path 
+        path = path.replace(/^(l\/)/mg, '');
 
-    else
-        return basePath + '/' + FILE_RESOURCES_INFO[referenceKey] + '/' + pathExpression
+        // check if any last / exists
+        if ((new RegExp(/\/([^\/]*|)$/mg)).test(path)) {
+            // replacing last / with /en/
+            path = path.replace(/\/([^\/]*|)$/mg, `/${CURRENT_LOCALE}/$1`)
+        } else {
+            // appending en/ to path
+            path = `${CURRENT_LOCALE}/` + path
+        }
+
+    }
+    return basePath + '/' + FILE_RESOURCES_INFO[referenceKey] + '/' + path
 }
 
 
@@ -67,7 +80,7 @@ describe('Test-Suite All Resources Existence Check', () => {
                         const resourcePath = getFilePathToCheck(lessonDirectory, referenceKey, pathExpression);
                         console.log(resourcePath);
                         const isAvailable = fs.existsSync(resourcePath)
-                        test(`${lessonDirectory} > ${segmentKeys[segmentindex]}:             ${referenceKey} resource (${pathExpression}) is available.`, () => {
+                        test(`${lessonDirectory} > ${segmentKeys[segmentindex]} : ${referenceKey} resource (${pathExpression}) is available.`, () => {
                             expect(isAvailable).toBeTruthy()
                         })
                     }
