@@ -1,7 +1,7 @@
 const fs = require('fs');
 const glob = require('fast-glob');
 const path = require('path');
-const yaml = require('js-yaml')
+const yaml = require('js-yaml');
 
 const LESSON_INDEX_FILE = 'index.yml';
 
@@ -65,10 +65,16 @@ function getActivityFile(lessonDirectory) {
 }
 
 describe('Test-Suite All Resources Existence Check', () => {
-    const lessonDirectories = getLessonDirectories()
+    let lessonDirectories = getLessonDirectories()
+
+    // to simulate the testing process for larger number of lessonDirectories
+    let largeCountOfLessonDirectories = []
+    for (let i = 0; i < 100; i++) {
+        largeCountOfLessonDirectories = largeCountOfLessonDirectories.concat(lessonDirectories)
+    }
     const referenceKeys = Object.keys(FILE_RESOURCES_INFO)
 
-    lessonDirectories.forEach((lessonDirectory) => {
+    largeCountOfLessonDirectories.forEach((lessonDirectory) => {
         const tt = getActivityFile(lessonDirectory)
         const segments = Object.values(tt.segments)
         const segmentKeys = Object.keys(tt.segments)
@@ -80,7 +86,7 @@ describe('Test-Suite All Resources Existence Check', () => {
                         const resourcePath = getFilePathToCheck(lessonDirectory, referenceKey, pathExpression);
                         console.log(resourcePath);
                         const isAvailable = fs.existsSync(resourcePath)
-                        test(`${lessonDirectory} > ${segmentKeys[segmentindex]} : ${referenceKey} resource (${pathExpression}) is available.`, () => {
+                        test.concurrent(`${lessonDirectory} > ${segmentKeys[segmentindex]} : ${referenceKey} resource (${pathExpression}) is available.`, async() => {
                             expect(isAvailable).toBeTruthy()
                         })
                     }
