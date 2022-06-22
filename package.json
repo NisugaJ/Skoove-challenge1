@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "description": "Skoove Content Development Coding Challenge",
     "scripts": {
-        "test": "cls && jest",
+        "test": "cls && jest --silent",
         "whatIsTheTestCoverage": "jest --collectCoverage"
     },
     "author": "Learnfield GmbH",
