@@ -3,20 +3,21 @@
     "version": "0.1.0",
     "description": "Skoove Content Development Coding Challenge",
     "scripts": {
-        "test": "cls && jest --silent",
+        "test": "jest",
         "whatIsTheTestCoverage": "jest --collectCoverage"
     },
     "author": "Learnfield GmbH",
     "license": "UNLICENSED",
     "private": true,
     "devDependencies": {
-        "fast-glob": "^3.2",
         "eslint": "^7.29.0",
         "eslint-config-airbnb-base": "^14.2.1",
         "eslint-plugin-import": "^2.23.4",
+        "fast-glob": "^3.2",
         "glob": "^7.1.6",
         "jest": "^24.8.0",
-        "jest-junit": "^13.0.0"
+        "jest-junit": "^13.0.0",
+        "json-beautify": "^1.1.1"
     },
     "dependencies": {
         "browser-fs-access": "^0.20.5",
