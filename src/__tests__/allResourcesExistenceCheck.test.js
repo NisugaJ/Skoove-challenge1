@@ -30,6 +30,8 @@ function getLessonDirectories() {
 function getFilePathToCheck(lessonDirectory, referenceKey, pathExpression) {
     let basePath = lessonDirectory
     let path = pathExpression
+
+    // check if path starts with /
     if ((new RegExp(/^(\/)/mg)).test(path)) {
         basePath = SHARED_FOLDER
         path = path.replace(/^(\/)/mg, '')
@@ -39,7 +41,7 @@ function getFilePathToCheck(lessonDirectory, referenceKey, pathExpression) {
         // removal of l/ at start of the path 
         path = path.replace(/^(l\/)/mg, '');
 
-        // check if any last / exists
+        // check for last occurence of /
         if ((new RegExp(/\/([^\/]*|)$/mg)).test(path)) {
             // replacing last / with /en/
             path = path.replace(/\/([^\/]*|)$/mg, `/${CURRENT_LOCALE}/$1`)
@@ -66,10 +68,11 @@ function getActivityFile(lessonDirectory) {
 
 describe('Test-Suite All Resources Existence Check', () => {
     let lessonDirectories = getLessonDirectories()
+    let unavailableResources = []
 
-    // to simulate the testing process for larger number of lessonDirectories
+    // to simulate the testing process for larger number of lessonDirectories, change i to a larger number (eg.100)
     let largeCountOfLessonDirectories = []
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 1; i++) {
         largeCountOfLessonDirectories = largeCountOfLessonDirectories.concat(lessonDirectories)
     }
     const referenceKeys = Object.keys(FILE_RESOURCES_INFO)
@@ -79,14 +82,24 @@ describe('Test-Suite All Resources Existence Check', () => {
         const segments = Object.values(tt.segments)
         const segmentKeys = Object.keys(tt.segments)
 
-        segments.forEach((segment, segmentindex) => {
+        segments.forEach((segment, segmentIndex) => {
             referenceKeys.forEach(referenceKey => {
                     if (segment[referenceKey] && segment[referenceKey]['src'] && segment[referenceKey]['src'].length > 0) {
                         let pathExpression = segment[referenceKey]['src'];
                         const resourcePath = getFilePathToCheck(lessonDirectory, referenceKey, pathExpression);
-                        console.log(resourcePath);
+                        // console.log(resourcePath);
                         const isAvailable = fs.existsSync(resourcePath)
-                        test.concurrent(`${lessonDirectory} > ${segmentKeys[segmentindex]} : ${referenceKey} resource (${pathExpression}) is available.`, async() => {
+                        test.concurrent(`${lessonDirectory} > ${segmentKeys[segmentIndex]} : ${referenceKey} resource (${pathExpression}) is available.`, async() => {
+                            if (!isAvailable) {
+
+                                unavailableResources.push({
+                                    'LessonDirectory': lessonDirectory,
+                                    'Segment': `segment${segmentIndex + 1}`,
+                                    'ReferenceKey': referenceKey,
+                                    'PathEexpression': pathExpression,
+                                    'UnavailableResourcePath': resourcePath,
+                                })
+                            }
                             expect(isAvailable).toBeTruthy()
                         })
                     }
@@ -95,4 +108,18 @@ describe('Test-Suite All Resources Existence Check', () => {
             )
         })
     })
+
+
+    afterAll(() => {
+        /*** Generate report of Unavailable Resources into test-reports/unavailableResources_<epoch-timestamp>.json ***/
+        if (unavailableResources.length > 0) {
+            var beautify = require("json-beautify");
+            var fs = require('fs');
+            let beautified = beautify(unavailableResources, null, 2, 80)
+            fs.writeFile(`./test-reports/unavailableResources_${Date.now()}.json`,
+                beautified)
+            console.log('Finished all');
+        }
+        /*********************************************************************************************************/
+    });
 })
