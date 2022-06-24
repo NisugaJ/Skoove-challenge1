@@ -31,22 +31,25 @@ function getFilePathToCheck(lessonDirectory, referenceKey, pathExpression) {
     let basePath = lessonDirectory
     let path = pathExpression
 
-    // check if path starts with /
+    // check if path starts with '/'
     if ((new RegExp(/^(\/)/mg)).test(path)) {
-        basePath = SHARED_FOLDER
+        // set base path as SHARED_FOLDER
+        basePath = SHARED_FOLDER;
+        // remove the '/' at start of the path
         path = path.replace(/^(\/)/mg, '')
     }
 
+    // check if path starts with 'l/'
     if ((new RegExp(/^(l\/)/mg)).test(path)) {
-        // removal of l/ at start of the path 
+        // removal of 'l/' at start of the path 
         path = path.replace(/^(l\/)/mg, '');
 
-        // check for last occurence of /
+        // check for last occurence of '/'
         if ((new RegExp(/\/([^\/]*|)$/mg)).test(path)) {
-            // replacing last / with /en/
+            // replacing last '/' with '/en/'
             path = path.replace(/\/([^\/]*|)$/mg, `/${CURRENT_LOCALE}/$1`)
         } else {
-            // appending en/ to path
+            // appending 'en/' to path
             path = `${CURRENT_LOCALE}/` + path
         }
 
