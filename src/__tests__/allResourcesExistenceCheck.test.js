@@ -21,6 +21,7 @@ const SHARED_FOLDER = "src/content/shared"
 const SCHEMA_JSON = "src/schema/activity-schema.json"
 
 function getLessonDirectories() {
+    // extracting lesson directory paths by identitying paths of index files in src/content directory
     return glob.sync([`src/content/**/` + LESSON_INDEX_FILE])
         .map(
             path => path.split(`/${LESSON_INDEX_FILE}`)[0]
