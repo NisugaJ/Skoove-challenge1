@@ -58,12 +58,15 @@ function getFilePathToCheck(lessonDirectory, referenceKey, pathExpression) {
 }
 
 
-function getActivityFile(lessonDirectory) {
+function getActivityFileObjects(lessonDirectory) {
     try {
         const indexDoc = yaml.load(fs.readFileSync(lessonDirectory + '/' + LESSON_INDEX_FILE, 'utf8'))
 
-        const activityDoc = yaml.load(fs.readFileSync(lessonDirectory + '/' + indexDoc[0].src + '.yml', 'utf8'))
-        return activityDoc
+        let activityDocObjects = []
+        indexDoc.forEach(indexElement => {
+            activityDocObjects.push(yaml.load(fs.readFileSync(lessonDirectory + '/' + indexElement.src + '.yml', 'utf8')))
+        });
+        return activityDocObjects
     } catch (e) {
         console.log(e);
     }
@@ -81,12 +84,14 @@ describe('Test-Suite All Resources Existence Check', () => {
     const referenceKeys = Object.keys(FILE_RESOURCES_INFO)
 
     largeCountOfLessonDirectories.forEach((lessonDirectory) => {
-        const tt = getActivityFile(lessonDirectory)
-        const segments = Object.values(tt.segments)
-        const segmentKeys = Object.keys(tt.segments)
+        const activityFileObjects = getActivityFileObjects(lessonDirectory)
 
-        segments.forEach((segment, segmentIndex) => {
-            referenceKeys.forEach(referenceKey => {
+        activityFileObjects.forEach(activityFileObject => {
+            const segments = Object.values(activityFileObject.segments)
+            const segmentKeys = Object.keys(activityFileObject.segments)
+
+            segments.forEach((segment, segmentIndex) => {
+                referenceKeys.forEach(referenceKey => {
                     if (segment[referenceKey] && segment[referenceKey]['src'] && segment[referenceKey]['src'].length > 0) {
                         let pathExpression = segment[referenceKey]['src'];
                         const resourcePath = getFilePathToCheck(lessonDirectory, referenceKey, pathExpression);
@@ -94,21 +99,19 @@ describe('Test-Suite All Resources Existence Check', () => {
                         const isAvailable = fs.existsSync(resourcePath)
                         test.concurrent(`${lessonDirectory} > ${segmentKeys[segmentIndex]} : ${referenceKey} resource (${pathExpression}) is available.`, async() => {
                             if (!isAvailable) {
-
                                 unavailableResources.push({
                                     'LessonDirectory': lessonDirectory,
                                     'Segment': `segment${segmentIndex + 1}`,
                                     'ReferenceKey': referenceKey,
-                                    'PathEexpression': pathExpression,
+                                    'PathExpression': pathExpression,
                                     'UnavailableResourcePath': resourcePath,
                                 })
                             }
                             expect(isAvailable).toBeTruthy()
                         })
                     }
-                }
-
-            )
+                })
+            })
         })
     })
 
