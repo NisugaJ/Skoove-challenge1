@@ -60,10 +60,14 @@ function getFilePathToCheck(lessonDirectory, referenceKey, pathExpression) {
 
 function getActivityFileObjects(lessonDirectory) {
     try {
+        // read index file of the lessonDirectory
         const indexDoc = yaml.load(fs.readFileSync(lessonDirectory + '/' + LESSON_INDEX_FILE, 'utf8'))
 
         let activityDocObjects = []
+
+        // from each json element in indexDoc
         indexDoc.forEach(indexElement => {
+            // read the activity object content
             activityDocObjects.push(yaml.load(fs.readFileSync(lessonDirectory + '/' + indexElement.src + '.yml', 'utf8')))
         });
         return activityDocObjects
@@ -73,35 +77,48 @@ function getActivityFileObjects(lessonDirectory) {
 }
 
 describe('Test-Suite All Resources Existence Check', () => {
+    // read all the available lesson directories
     let lessonDirectories = getLessonDirectories()
+
     let unavailableResources = []
+    const referenceKeys = Object.keys(FILE_RESOURCES_INFO)
 
     // to simulate the testing process for larger number of lessonDirectories, change i to a larger number (eg.100)
     let largeCountOfLessonDirectories = []
     for (let i = 0; i < 1; i++) {
         largeCountOfLessonDirectories = largeCountOfLessonDirectories.concat(lessonDirectories)
     }
-    const referenceKeys = Object.keys(FILE_RESOURCES_INFO)
 
     largeCountOfLessonDirectories.forEach((lessonDirectory) => {
+        // extract content of each activityFileObject in the lesson directory using index.yml file
         const activityFileObjects = getActivityFileObjects(lessonDirectory)
 
         activityFileObjects.forEach(activityFileObject => {
+            // extract segments and segmentKeys of the activityFileObject
             const segments = Object.values(activityFileObject.segments)
             const segmentKeys = Object.keys(activityFileObject.segments)
 
             segments.forEach((segment, segmentIndex) => {
                 referenceKeys.forEach(referenceKey => {
+                    // check if any src element exists in a referenceKey(E.g flyer, expectation,startVoiceOver,...)
                     if (segment[referenceKey] && segment[referenceKey]['src'] && segment[referenceKey]['src'].length > 0) {
+
+                        // read the pathExpression from src (E.g. l/DDffDDff.svg )
                         let pathExpression = segment[referenceKey]['src'];
+
+                        // build a resource path using lessonDirectory, referenceKey, pathExpression. (E.g. src/content/shared/voice/reminder_note_duration.aifc)
                         const resourcePath = getFilePathToCheck(lessonDirectory, referenceKey, pathExpression);
-                        // console.log(resourcePath);
+
+                        // check if any file exists for the resource path
                         const isAvailable = fs.existsSync(resourcePath)
+
                         test.concurrent(`${lessonDirectory} > ${segmentKeys[segmentIndex]} : ${referenceKey} resource (${pathExpression}) is available.`, async() => {
+
+                            // append unavailableResource details to an array
                             if (!isAvailable) {
                                 unavailableResources.push({
                                     'LessonDirectory': lessonDirectory,
-                                    'Segment': `segment${segmentIndex + 1}`,
+                                    'Segment': `${segmentKeys[segmentIndex]}`,
                                     'ReferenceKey': referenceKey,
                                     'PathExpression': pathExpression,
                                     'UnavailableResourcePath': resourcePath,
